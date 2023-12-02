@@ -19,66 +19,74 @@ import {Separator} from "@/components/ui/separator.tsx";
 
 const algorithms: { name: string, id: string }[] = [
     {
-        name: "Dijsktra's Algorithm",
-        id: "dijkstra"
+        name: "Lee's Algorithm",
+        id: "lee"
     },
-    {
-        name: "A* Search",
-        id: "astar"
-    },
-    {
-        name: "Greedy Best-first Search",
-        id: "greedy"
-    },
-    {
-        name: "Swarm Algorithm",
-        id: "swarm"
-    },
-    {
-        name: "Convergent Swarm Algorithm",
-        id: "convergent"
-    },
-    {
-        name: "Bidirectional Swarm Algorithm",
-        id: "bidirectional"
-    },
-    {
-        name: "Breadth-first Search",
-        id: "bfs"
-    },
-    {
-        name: "Depth-first Search",
-        id: "dfs"
-    }
+    // {
+    //     name: "Dijkstra's Algorithm",
+    //     id: "dijkstra"
+    // },
+    // {
+    //     name: "A* Search",
+    //     id: "astar"
+    // },
+    // {
+    //     name: "Greedy Best-first Search",
+    //     id: "greedy"
+    // },
+    // {
+    //     name: "Swarm Algorithm",
+    //     id: "swarm"
+    // },
+    // {
+    //     name: "Convergent Swarm Algorithm",
+    //     id: "convergent"
+    // },
+    // {
+    //     name: "Bidirectional Swarm Algorithm",
+    //     id: "bidirectional"
+    // },
+    // {
+    //     name: "Breadth-first Search",
+    //     id: "bfs"
+    // },
+    // {
+    //     name: "Depth-first Search",
+    //     id: "dfs"
+    // }
 ]
 
-const Topbar = (props: any) => {
+interface Props {
+    generateMazePattern: (pattern: string) => void
+}
+
+const Topbar = (props: Props) => {
 
     const mazesAndPatterns: { name: string, id: string }[] = [
         {
             name: "Recursive Division",
             id: "recursive-division"
         },
-        {
-            name: "Recursive Division (Vertical Skew)",
-            id: "recursive-division-vertical-skew"
-        },
-        {
-            name: "Recursive Division (Horizontal Skew)",
-            id: "recursive-division-horizontal-skew"
-        },
-        {
-            name: "Basic Random Maze",
-            id: "basic-random-maze"
-        },
-        {
-            name: "Basic Weight Maze",
-            id: "basic-weight-maze"
-        },
-        {
-            name: "Simple Stair Pattern",
-            id: "simple-stair-pattern"
-        }
+        // {
+        //     name: "Recursive Division (Vertical Skew)",
+        //     id: "recursive-division-vertical-skew"
+        // },
+        // {
+        //     name: "Recursive Division (Horizontal Skew)",
+        //     id: "recursive-division-horizontal-skew"
+        // },
+        // {
+        //     name: "Basic Random Maze",
+        //     id: "basic-random-maze"
+        // },
+        // {
+        //     name: "Basic Weight Maze",
+        //     id: "basic-weight-maze"
+        // },
+        // {
+        //     name: "Simple Stair Pattern",
+        //     id: "simple-stair-pattern"
+        // }
     ]
 
     const [algorithm, setAlgorithm] = React.useState("")

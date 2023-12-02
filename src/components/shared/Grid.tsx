@@ -72,6 +72,7 @@ const Grid = () => {
     }
 
     function generateGrid() {
+        setBomb(false)
         const width = window.innerWidth * 0.95 / 25;
         const height = (window.innerHeight - 240) / 25;
 
@@ -140,11 +141,12 @@ const Grid = () => {
     }
 
     function generateMazePattern(algorithm: string) {
+
         clearWallsAndWeights();
         clearPath();
         switch (algorithm) {
             case "recursive-division":
-                setFinalGrid(getRecursiveDivisonMaze(finalGridRef.current))
+                getRecursiveDivisonMaze(finalGridRef.current, saveGridState);
                 break;
         }
     }
