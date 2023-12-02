@@ -58,6 +58,19 @@ const Grid = () => {
         finalGridRef.current = grid;
     }
 
+    function clearWallsAndWeights() {
+        if (finalGridRef.current === undefined) return;
+        for (let i = 0; i < finalGridRef.current.length; i++) {
+            for (let j = 0; j < finalGridRef.current[i].length; j++) {
+                if (finalGridRef.current[i][j] === 1 || finalGridRef.current[i][j] === 2) {
+                    finalGridRef.current[i][j] = 0;
+                }
+            }
+        }
+        setFinalGrid([...finalGridRef.current]);
+        finalGridRef.current = [...finalGridRef.current];
+    }
+
     useEffect(() => {
         if (typeof window === "undefined") return;
         if (typeof document === "undefined") return;
@@ -130,7 +143,7 @@ const Grid = () => {
                         <DropdownMenuLabel>Quick Actions</DropdownMenuLabel>
                         <DropdownMenuSeparator/>
                         <DropdownMenuItem onClick={generateGrid}>Clear Board</DropdownMenuItem>
-                        <DropdownMenuItem>Clear Walls & Weights</DropdownMenuItem>
+                        <DropdownMenuItem onClick={clearWallsAndWeights}>Clear Walls & Weights</DropdownMenuItem>
                         <DropdownMenuItem>Clear Path</DropdownMenuItem>
                         <DropdownMenuSub>
                             <DropdownMenuSubTrigger>Speed</DropdownMenuSubTrigger>
