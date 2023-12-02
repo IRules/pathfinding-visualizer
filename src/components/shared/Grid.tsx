@@ -28,11 +28,11 @@ const Grid = () => {
 
     const [finalGrid, setFinalGrid] = useState<number[][]>([]);
 
-    const [isLoaded, setIsLoaded] = useState<boolean>(false);
-
     const [speed, setSpeed] = useState<string>("fast")
 
     const [selectedCommand, setSelectedCommand] = useState<string>("walls");
+
+    const finalGridRef = useRef<number[][]>();
 
     const command = useRef<string>(selectedCommand)
 
@@ -40,7 +40,7 @@ const Grid = () => {
 
     function generateGrid() {
         const width = window.innerWidth * 0.9 / 25;
-        const height = ( window.innerHeight - 240 ) / 25;
+        const height = (window.innerHeight - 240) / 25;
 
         const grid: number[][] = [];
         for (let i = 0; i < height; i++) {
@@ -50,16 +50,17 @@ const Grid = () => {
             }
         }
 
-        grid[Math.round(height/2)][Math.round(width/8)] = 3;
-        grid[Math.round(height/2)][Math.round(width - width/8)] = 4;
+        grid[Math.round(height / 2)][Math.round(width / 8)] = 3;
+        grid[Math.round(height / 2)][Math.round(width - width / 8)] = 4;
 
 
         setFinalGrid(grid);
+        finalGridRef.current = grid;
     }
 
     useEffect(() => {
         if (typeof window === "undefined") return;
-        if( typeof document === "undefined") return;
+        if (typeof document === "undefined") return;
         generateGrid();
 
         window.addEventListener("pointerdown", () => {
@@ -70,68 +71,55 @@ const Grid = () => {
             isDown.current = false;
         })
 
+
+        window.addEventListener("pointerover", (event) => {
+            if (!isDown.current || finalGridRef.current === undefined) return;
+            const [i, j] = (event.target as HTMLElement).id.split(',').map(function (item) {
+                return parseInt(item, 10);
+            });
+            if (isNaN(i) || isNaN(j)) return;
+            switch (command.current) {
+                case "walls":
+                    if (finalGridRef.current[i][j] === 0) finalGridRef.current[i][j] = 1;
+                    break;
+                case "weight":
+                    if (finalGridRef.current[i][j] === 0 || finalGridRef.current[i][j] === 1) finalGridRef.current[i][j] = 2;
+                    break;
+                case "delete":
+                    if (finalGridRef.current[i][j] === 1 || finalGridRef.current[i][j] === 2)
+                        finalGridRef.current[i][j] = 0
+                    break;
+            }
+            setFinalGrid([...finalGridRef.current])
+            finalGridRef.current = [...finalGridRef.current]
+        });
+
         return () => {
-            window.removeEventListener("pointerdown", () => {});
-            window.removeEventListener("pointerup", () => {});
+            window.removeEventListener("pointerdown", () => {
+            });
+            window.removeEventListener("pointerup", () => {
+            });
+            window.removeEventListener("pointerover", () => {
+            });
         }
     }, [isDown]);
 
-    useEffect(() => {
-        if (isLoaded) return;
 
-        finalGrid.map(
-            (row, i) => {
-                row.map(
-                    (_col, j) => {
-                        const element = document.getElementById(`grid`)!.children[i].children[j];
-                        element.addEventListener("pointerover", () => {
-                            if(!isDown.current) return;
-                            switch (command.current) {
-                                case "walls":
-                                    if(finalGrid[i][j] === 0) finalGrid[i][j] = 1;
-                                    break;
-                                case "weight":
-                                    if(finalGrid[i][j] === 0 || finalGrid[i][j] === 1) finalGrid[i][j] = 2;
-                                    break;
-                                case "delete":
-                                    if(finalGrid[i][j] === 1 || finalGrid[i][j] === 2) finalGrid[i][j] = 0;
-                                    break;
-                            }
-                            setFinalGrid([...finalGrid]);
-                        })
-                        setIsLoaded(true)
-                    }
-                )
-            }
-        )
-
-        return () => {
-            finalGrid.map(
-                (row, i) => {
-                    row.map(
-                        (_col, j) => {
-                            const element = document.getElementById(`grid`)!.children[i].children[j];
-                            element.removeEventListener("pointerover", () => {})
-                        }
-                    )
-                }
-            )
-            window.removeEventListener("pointerdown", () => {});
-            window.removeEventListener("pointerup", () => {});
-        }
-    }, [finalGrid]);
     return (
         <section className="w-screen flex flex-col justify-center items-center flex-wrap p-10">
             <div className="flex h-16 items-center w-full gap-3 px-12 justify-between">
-                <ToggleGroup type="single" variant="outline" value={selectedCommand} onValueChange={(value) => {setSelectedCommand(value); command.current = value}}>
+                <ToggleGroup type="single" variant="outline" value={selectedCommand} onValueChange={(value) => {
+                    setSelectedCommand(value);
+                    command.current = value
+                }}>
                     <ToggleGroupItem value="walls" aria-label="Add Walls">
-                        <Cuboid strokeWidth={3} className="h-4 w-4" />
+                        <Cuboid strokeWidth={3} className="h-4 w-4"/>
                     </ToggleGroupItem>
                     <ToggleGroupItem value="weight" aria-label="Add Weights">
-                        <Weight strokeWidth={3} className="h-4 w-4" />
+                        <Weight strokeWidth={3} className="h-4 w-4"/>
                     </ToggleGroupItem>
                     <ToggleGroupItem value="delete" aria-label="Delete Walls & Weights">
-                        <Eraser strokeWidth={3} className="h-4 w-4" />
+                        <Eraser strokeWidth={3} className="h-4 w-4"/>
                     </ToggleGroupItem>
                 </ToggleGroup>
                 <DropdownMenu>
@@ -160,23 +148,28 @@ const Grid = () => {
                 </DropdownMenu>
             </div>
             <div id="grid" className=" h-full">
-            {
-                finalGrid.map((row, i) => {
-                    return (
-                        <div key={i} className="flex">
-                            {
-                                row.map((_col, j) => {
-                                    return (
-                                        <div key={j} className="w-[25px] h-[25px] border-[0.5px] border-gray-600 flex justify-center items-center">
-                                            { finalGrid[i][j] === 1 ? <div className="w-full h-full bg-gray-700" /> : finalGrid[i][j] === 2 ? <Weight strokeWidth={2} /> : finalGrid[i][j] === 3 ? <Play strokeWidth={5} /> : finalGrid[i][j] === 4 ? <CircleDot strokeWidth={5} /> : null}
-                                        </div>
-                                    )
-                                })
-                            }
-                        </div>
-                    )
-                })
-            }
+                {
+                    finalGrid.map((row, i) => {
+                        return (
+                            <div key={i} className="flex">
+                                {
+                                    row.map((_col, j) => {
+                                        return (
+                                            <div key={j} id={[i, j].toString()}
+                                                 className="w-[25px] h-[25px] border-[0.5px] border-gray-600 flex justify-center items-center">
+                                                {finalGrid[i][j] === 1 ? <div
+                                                    className="w-full h-full bg-gray-700"/> : finalGrid[i][j] === 2 ?
+                                                    <Weight  strokeWidth={2} id={[i, j].toString()}/> : finalGrid[i][j] === 3 ?
+                                                        <Play strokeWidth={5}/> : finalGrid[i][j] === 4 ?
+                                                            <CircleDot strokeWidth={5}/> : null}
+                                            </div>
+                                        )
+                                    })
+                                }
+                            </div>
+                        )
+                    })
+                }
             </div>
 
         </section>
