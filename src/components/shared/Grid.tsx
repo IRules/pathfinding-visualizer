@@ -98,7 +98,6 @@ const Grid = () => {
         generateGrid();
 
         window.addEventListener("pointerdown", (event) => {
-            event.preventDefault();
             const [i, j] = getIAndJ(event);
             if (isNaN(i) || isNaN(j)) return;
             if (finalGridRef.current === undefined) return;
@@ -109,15 +108,13 @@ const Grid = () => {
             isDown.current = true;
         })
 
-        window.addEventListener("pointerup", (event) => {
-            event.preventDefault();
+        window.addEventListener("pointerup", () => {
             isDown.current = false;
             isStartOrEnd.current = undefined;
         })
 
 
         window.addEventListener("pointerover", (event) => {
-            event.preventDefault();
             if (!isDown.current || finalGridRef.current === undefined) return;
             const [i, j] = getIAndJ(event);
             if (isNaN(i) || isNaN(j)) return;
@@ -208,15 +205,12 @@ const Grid = () => {
                                             <div key={j} id={[i, j].toString()}
                                                  className="w-[25px] h-[25px] border-[0.5px] border-gray-600 flex justify-center items-center">
                                                 {finalGrid[i][j] === 1 ? <div
-                                                    className="w-full h-full bg-gray-700"/> : finalGrid[i][j] === 2 ?
+                                                    className="w-full h-full bg-gray-700 pointer-events-none"/> : finalGrid[i][j] === 2 ?
                                                     <Weight strokeWidth={2}
-                                                            id={[i, j].toString()}
                                                             className="w-full h-full pointer-events-none"/> : finalGrid[i][j] === 3 ?
                                                         <Play strokeWidth={5}
-                                                              className="w-full h-full pointer-events-none"
-                                                              id={[i, j].toString()}/> : finalGrid[i][j] === 4 ?
-                                                            <CircleDot className="w-full h-full pointer-events-none"
-                                                                       strokeWidth={5} id={[i, j].toString()}/> : null}
+                                                              className="w-full h-full pointer-events-none"/> : finalGrid[i][j] === 4 ?
+                                                            <CircleDot className="w-full h-full pointer-events-none"/> : null}
                                             </div>
                                         )
                                     })
