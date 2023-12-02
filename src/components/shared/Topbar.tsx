@@ -52,34 +52,34 @@ const algorithms: { name: string, id: string }[] = [
     }
 ]
 
-const mazesAndPatterns: { name: string, id: string }[] = [
-    {
-        name: "Recursive Division",
-        id: "recursive-division"
-    },
-    {
-        name: "Recursive Division (Vertical Skew)",
-        id: "recursive-division-vertical-skew"
-    },
-    {
-        name: "Recursive Division (Horizontal Skew)",
-        id: "recursive-division-horizontal-skew"
-    },
-    {
-        name: "Basic Random Maze",
-        id: "basic-random-maze"
-    },
-    {
-        name: "Basic Weight Maze",
-        id: "basic-weight-maze"
-    },
-    {
-        name: "Simple Stair Pattern",
-        id: "simple-stair-pattern"
-    }
-]
+const Topbar = (props: any) => {
 
-const Topbar = () => {
+    const mazesAndPatterns: { name: string, id: string }[] = [
+        {
+            name: "Recursive Division",
+            id: "recursive-division"
+        },
+        {
+            name: "Recursive Division (Vertical Skew)",
+            id: "recursive-division-vertical-skew"
+        },
+        {
+            name: "Recursive Division (Horizontal Skew)",
+            id: "recursive-division-horizontal-skew"
+        },
+        {
+            name: "Basic Random Maze",
+            id: "basic-random-maze"
+        },
+        {
+            name: "Basic Weight Maze",
+            id: "basic-weight-maze"
+        },
+        {
+            name: "Simple Stair Pattern",
+            id: "simple-stair-pattern"
+        }
+    ]
 
     const [algorithm, setAlgorithm] = React.useState("")
     const [mazePattern, setMazePattern] = React.useState("")
@@ -120,7 +120,10 @@ const Topbar = () => {
                 <DropdownMenuContent className="w-56">
                     <DropdownMenuLabel>Mazes & Patterns</DropdownMenuLabel>
                     <DropdownMenuSeparator/>
-                    <DropdownMenuRadioGroup value={mazePattern} onValueChange={setMazePattern}>
+                    <DropdownMenuRadioGroup value={mazePattern} onValueChange={(event) => {
+                        setMazePattern(event);
+                        props.generateMazePattern(event);
+                    }}>
                         {mazesAndPatterns.map((algo) => (
                             <DropdownMenuRadioItem key={algo.id} value={algo.id}>
                                 {algo.name}

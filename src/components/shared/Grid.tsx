@@ -10,6 +10,8 @@ import {
 } from "@/components/ui/dropdown-menu.tsx";
 import {Button} from "@/components/ui/button.tsx";
 import {Separator} from "@/components/ui/separator.tsx";
+import Topbar from "@/components/shared/Topbar.tsx";
+import getRecursiveDivisonMaze from "@/algorithms/maze/RecursiveDivision.ts";
 
 /*
 * 0 - empty box
@@ -46,7 +48,7 @@ const Grid = () => {
     function addOrRemoveBomb() {
         if (finalGridRef.current === undefined) return;
 
-        if(bomb) {
+        if (bomb) {
             setBomb(false);
             for (let i = 0; i < finalGridRef.current.length; i++) {
                 for (let j = 0; j < finalGridRef.current[i].length; j++) {
@@ -57,11 +59,16 @@ const Grid = () => {
             }
             return;
         }
-
-        if ( finalGridRef.current[0][0] === 3 || finalGridRef.current[0][0] === 4) finalGridRef.current[0][1] = 5;
-        else finalGridRef.current[0][0] = 5;
-        setBomb(true)
-        saveGridState(finalGridRef.current);
+        for (let i = 0; i < finalGridRef.current.length; i++) {
+            for (let j = 0; j < finalGridRef.current[i].length; j++) {
+                if (finalGridRef.current[i][j] === 0) {
+                    finalGridRef.current[i][j] = 5;
+                    setBomb(true)
+                    saveGridState(finalGridRef.current);
+                    return;
+                }
+            }
+        }
     }
 
     function generateGrid() {
@@ -114,7 +121,7 @@ const Grid = () => {
         const aux = previousStartOrEnd.current;
         if (!(aux[0] === i && aux[1] === j))
             previousStartOrEnd.current = [i, j, finalGridRef.current[i][j]];
-        if(aux[2] === 5 || aux[2] === 3 || aux[2] === 4) finalGridRef.current[aux[0]][aux[1]] = 0;
+        if (aux[2] === 5 || aux[2] === 3 || aux[2] === 4) finalGridRef.current[aux[0]][aux[1]] = 0;
         else finalGridRef.current[aux[0]][aux[1]] = aux[2];
         finalGridRef.current[i][j] = isStartOrEnd.current as number;
         saveGridState(finalGridRef.current);
@@ -130,6 +137,16 @@ const Grid = () => {
     function saveGridState(finalGridRefState: number[][]) {
         setFinalGrid([...finalGridRefState])
         finalGridRef.current = [...finalGridRefState]
+    }
+
+    function generateMazePattern(algorithm: string) {
+        clearWallsAndWeights();
+        clearPath();
+        switch (algorithm) {
+            case "recursive-division":
+                setFinalGrid(getRecursiveDivisonMaze(finalGridRef.current))
+                break;
+        }
     }
 
     useEffect(() => {
@@ -189,76 +206,82 @@ const Grid = () => {
 
 
     return (
-        <section className="w-screen flex flex-col justify-center items-center flex-wrap py-10">
-            <div className="flex h-16 items-center w-full gap-3 px-12 justify-between">
-                <div className="flex gap-3">
-                <ToggleGroup type="single" variant="outline" value={selectedCommand} onValueChange={(value) => {
-                    setSelectedCommand(value);
-                    command.current = value
-                }}>
-                    <ToggleGroupItem value="walls" aria-label="Add Walls">
-                        <Cuboid strokeWidth={3} className="h-4 w-4"/>
-                    </ToggleGroupItem>
-                    <ToggleGroupItem value="weight" aria-label="Add Weights">
-                        <Weight strokeWidth={3} className="h-4 w-4"/>
-                    </ToggleGroupItem>
-                    <ToggleGroupItem value="delete" aria-label="Delete Walls & Weights">
-                        <Eraser strokeWidth={3} className="h-4 w-4"/>
-                    </ToggleGroupItem>
-                    <ToggleGroupItem value="moveStartOrEnd" aria-label="Move Start or End">
-                        <Move strokeWidth={3} className="h-4 w-4"/>
-                    </ToggleGroupItem>
-                </ToggleGroup>
-                <Separator orientation="vertical" className="h-10"/>
-                    <ToggleGroup type="single" variant="outline" value={bomb ? "bomb" : "none"} onValueChange={() => {
-                        addOrRemoveBomb()
-                    }}>
-                        <ToggleGroupItem value="bomb" aria-label="Add Walls">
-                            <Bomb strokeWidth={3} className="h-4 w-4" />
-                        </ToggleGroupItem>
-                    </ToggleGroup>
+        <>
+            <Topbar generateMazePattern={generateMazePattern}/>
+            <section className="w-screen flex flex-col justify-center items-center flex-wrap py-10">
+                <div className="flex h-16 items-center w-full gap-3 px-12 justify-between">
+                    <div className="flex gap-3">
+                        <ToggleGroup type="single" variant="outline" value={selectedCommand} onValueChange={(value) => {
+                            setSelectedCommand(value);
+                            command.current = value
+                        }}>
+                            <ToggleGroupItem value="walls" aria-label="Add Walls">
+                                <Cuboid strokeWidth={3} className="h-4 w-4"/>
+                            </ToggleGroupItem>
+                            <ToggleGroupItem value="weight" aria-label="Add Weights">
+                                <Weight strokeWidth={3} className="h-4 w-4"/>
+                            </ToggleGroupItem>
+                            <ToggleGroupItem value="delete" aria-label="Delete Walls & Weights">
+                                <Eraser strokeWidth={3} className="h-4 w-4"/>
+                            </ToggleGroupItem>
+                            <ToggleGroupItem value="moveStartOrEnd" aria-label="Move Start or End">
+                                <Move strokeWidth={3} className="h-4 w-4"/>
+                            </ToggleGroupItem>
+                        </ToggleGroup>
+                        <Separator orientation="vertical" className="h-10"/>
+                        <ToggleGroup type="single" variant="outline" value={bomb ? "bomb" : "none"}
+                                     onValueChange={() => {
+                                         addOrRemoveBomb()
+                                     }}>
+                            <ToggleGroupItem value="bomb" aria-label="Add Walls">
+                                <Bomb strokeWidth={3} className="h-4 w-4"/>
+                            </ToggleGroupItem>
+                        </ToggleGroup>
+                    </div>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="outline">Quick Actions</Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                            <DropdownMenuLabel>Quick Actions</DropdownMenuLabel>
+                            <DropdownMenuSeparator/>
+                            <DropdownMenuItem onClick={generateGrid}>Clear Board</DropdownMenuItem>
+                            <DropdownMenuItem onClick={clearWallsAndWeights}>Clear Walls & Weights</DropdownMenuItem>
+                            <DropdownMenuItem onClick={clearPath}>Clear Path</DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                 </div>
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="outline">Quick Actions</Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                        <DropdownMenuLabel>Quick Actions</DropdownMenuLabel>
-                        <DropdownMenuSeparator/>
-                        <DropdownMenuItem onClick={generateGrid}>Clear Board</DropdownMenuItem>
-                        <DropdownMenuItem onClick={clearWallsAndWeights}>Clear Walls & Weights</DropdownMenuItem>
-                        <DropdownMenuItem onClick={clearPath}>Clear Path</DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
-            </div>
-            <div id="grid" className=" h-full">
-                {
-                    finalGrid.map((row, i) => {
-                        return (
-                            <div key={i} className="flex">
-                                {
-                                    row.map((_col, j) => {
-                                        return (
-                                            <div key={j} id={[i, j].toString()}
-                                                 className={`w-[25px] h-[25px] border-[0.5px] border-gray-600 flex justify-center items-center ${finalGrid[i][j] === 1 ? "bg-gray-700" : null}`}>
-                                                {finalGrid[i][j] === 2 ?
-                                                    <Weight strokeWidth={2}
-                                                            className="w-full h-full pointer-events-none"/> : finalGrid[i][j] === 3 ?
-                                                        <Play strokeWidth={5}
-                                                              className="w-full h-full pointer-events-none"/> : finalGrid[i][j] === 4 ?
-                                                            <CircleDot strokeWidth={5} className="w-full h-full pointer-events-none"/> :  finalGrid[i][j] === 5 ?
-                                                                <Bomb strokeWidth={5} className="w-full h-full pointer-events-none"/> : null}
-                                            </div>
-                                        )
-                                    })
-                                }
-                            </div>
-                        )
-                    })
-                }
-            </div>
+                <div id="grid" className=" h-full">
+                    {
+                        finalGrid.map((row, i) => {
+                            return (
+                                <div key={i} className="flex">
+                                    {
+                                        row.map((_col, j) => {
+                                            return (
+                                                <div key={j} id={[i, j].toString()}
+                                                     className={`w-[25px] h-[25px] border-[0.5px] border-gray-600 flex justify-center items-center ${finalGrid[i][j] === 1 ? "bg-gray-700" : null}`}>
+                                                    {finalGrid[i][j] === 2 ?
+                                                        <Weight strokeWidth={2}
+                                                                className="w-full h-full pointer-events-none"/> : finalGrid[i][j] === 3 ?
+                                                            <Play strokeWidth={5}
+                                                                  className="w-full h-full pointer-events-none"/> : finalGrid[i][j] === 4 ?
+                                                                <CircleDot strokeWidth={5}
+                                                                           className="w-full h-full pointer-events-none"/> : finalGrid[i][j] === 5 ?
+                                                                    <Bomb strokeWidth={5}
+                                                                          className="w-full h-full pointer-events-none"/> : null}
+                                                </div>
+                                            )
+                                        })
+                                    }
+                                </div>
+                            )
+                        })
+                    }
+                </div>
 
-        </section>
+            </section>
+        </>
     )
 }
 export default Grid
