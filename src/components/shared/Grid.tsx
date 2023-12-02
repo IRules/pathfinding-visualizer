@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/dropdown-menu.tsx";
 import {Button} from "@/components/ui/button.tsx";
 import {Separator} from "@/components/ui/separator.tsx";
-import {Toggle} from "@/components/ui/toggle.tsx";
 
 /*
 * 0 - empty box
@@ -66,7 +65,7 @@ const Grid = () => {
     }
 
     function generateGrid() {
-        const width = window.innerWidth * 0.9 / 25;
+        const width = window.innerWidth * 0.95 / 25;
         const height = (window.innerHeight - 240) / 25;
 
         const grid: number[][] = [];
@@ -80,7 +79,7 @@ const Grid = () => {
         grid[Math.round(height / 2)][Math.round(width / 8)] = 3;
         grid[Math.round(height / 2)][Math.round(width - width / 8)] = 4;
 
-
+        setBomb(false)
         saveGridState(grid);
     }
 
@@ -190,7 +189,7 @@ const Grid = () => {
 
 
     return (
-        <section className="w-screen flex flex-col justify-center items-center flex-wrap p-10">
+        <section className="w-screen flex flex-col justify-center items-center flex-wrap py-10">
             <div className="flex h-16 items-center w-full gap-3 px-12 justify-between">
                 <div className="flex gap-3">
                 <ToggleGroup type="single" variant="outline" value={selectedCommand} onValueChange={(value) => {
@@ -211,9 +210,13 @@ const Grid = () => {
                     </ToggleGroupItem>
                 </ToggleGroup>
                 <Separator orientation="vertical" className="h-10"/>
-                    <Toggle aria-label="Add or Remove Bomb" onClick={addOrRemoveBomb}>
-                        <Bomb className="h-4 w-4" />
-                    </Toggle>
+                    <ToggleGroup type="single" variant="outline" value={bomb ? "bomb" : "none"} onValueChange={() => {
+                        addOrRemoveBomb()
+                    }}>
+                        <ToggleGroupItem value="bomb" aria-label="Add Walls">
+                            <Bomb strokeWidth={3} className="h-4 w-4" />
+                        </ToggleGroupItem>
+                    </ToggleGroup>
                 </div>
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
