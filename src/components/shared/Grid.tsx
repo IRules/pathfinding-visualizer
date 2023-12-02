@@ -210,10 +210,13 @@ const Grid = () => {
                                                 {finalGrid[i][j] === 1 ? <div
                                                     className="w-full h-full bg-gray-700"/> : finalGrid[i][j] === 2 ?
                                                     <Weight strokeWidth={2}
-                                                            id={[i, j].toString()}/> : finalGrid[i][j] === 3 ?
+                                                            id={[i, j].toString()}
+                                                            className="w-full h-full pointer-events-none"/> : finalGrid[i][j] === 3 ?
                                                         <Play strokeWidth={5}
+                                                              className="w-full h-full pointer-events-none"
                                                               id={[i, j].toString()}/> : finalGrid[i][j] === 4 ?
-                                                            <CircleDot strokeWidth={5} id={[i, j].toString()}/> : null}
+                                                            <CircleDot className="w-full h-full pointer-events-none"
+                                                                       strokeWidth={5} id={[i, j].toString()}/> : null}
                                             </div>
                                         )
                                     })
