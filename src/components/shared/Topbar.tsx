@@ -9,7 +9,7 @@ import {
     DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu.tsx";
 import {Button} from "@/components/ui/button.tsx";
-import React from "react";
+import React, {useState} from "react";
 import {ChevronDown, HelpCircle} from "lucide-react";
 import {Separator} from "@/components/ui/separator.tsx";
 
@@ -83,7 +83,7 @@ const Topbar = () => {
 
     const [algorithm, setAlgorithm] = React.useState("")
     const [mazePattern, setMazePattern] = React.useState("")
-    const [bomb, setBomb] = React.useState(false)
+    const [speed, setSpeed] = useState<string>("fast")
 
     return (
         <section className="flex h-16 items-center px-4 border-b gap-3">
@@ -129,12 +129,28 @@ const Topbar = () => {
                     </DropdownMenuRadioGroup>
                 </DropdownMenuContent>
             </DropdownMenu>
-            <Button variant="outline" onClick={() => setBomb(!bomb)}>{bomb ? "Remove Bomb" : "Add Bomb"}</Button>
             <div className="ml-auto flex gap-3 items-center space-x-4 h-10">
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="outline">{
+                            speed.slice(0, 1).toUpperCase() + speed.slice(1)
+                        }
+                            <ChevronDown className="w-4 h-4"/> </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                        <DropdownMenuLabel>Speed</DropdownMenuLabel>
+                        <DropdownMenuSeparator/>
+                        <DropdownMenuRadioGroup value={speed} onValueChange={setSpeed}>
+                            <DropdownMenuRadioItem value="fast">Fast</DropdownMenuRadioItem>
+                            <DropdownMenuRadioItem value="average">Average</DropdownMenuRadioItem>
+                            <DropdownMenuRadioItem value="slow">Slow</DropdownMenuRadioItem>
+                        </DropdownMenuRadioGroup>
+                    </DropdownMenuContent>
+                </DropdownMenu>
                 <Button className="bg-green-700 hover:bg-green-600">Visualize!</Button>
                 <Separator orientation="vertical"/>
                 <Button variant="outline" size="icon">
-                    <HelpCircle className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100" />
+                    <HelpCircle className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100"/>
                 </Button>
                 <ModeToggle/>
             </div>
