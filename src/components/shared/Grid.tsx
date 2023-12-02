@@ -58,8 +58,7 @@ const Grid = () => {
         grid[Math.round(height / 2)][Math.round(width - width / 8)] = 4;
 
 
-        setFinalGrid(grid);
-        finalGridRef.current = grid;
+        saveGridState(grid);
     }
 
     function clearWallsAndWeights() {
@@ -71,8 +70,7 @@ const Grid = () => {
                 }
             }
         }
-        setFinalGrid([...finalGridRef.current]);
-        finalGridRef.current = [...finalGridRef.current];
+        saveGridState(finalGridRef.current);
     }
 
     function clearPath() {
@@ -84,8 +82,7 @@ const Grid = () => {
                 }
             }
         }
-        setFinalGrid([...finalGridRef.current]);
-        finalGridRef.current = [...finalGridRef.current];
+        saveGridState(finalGridRef.current);
     }
 
     function moveStartAndEnd(i: number, j: number) {
@@ -95,7 +92,7 @@ const Grid = () => {
         finalGridRef.current[i][j] = isStartOrEnd.current === 3 ? 3 : 4;
         if (!(previousStartOrEnd.current[0] === i && previousStartOrEnd.current[1] === j))
             previousStartOrEnd.current = [i, j];
-        setFinalGrid([...finalGridRef.current]);
+        saveGridState(finalGridRef.current);
 
     }
 
@@ -103,6 +100,11 @@ const Grid = () => {
         return (event.target as HTMLElement).id.split(',').map(function (item) {
             return parseInt(item, 10);
         });
+    }
+
+    function saveGridState(finalGridRefState: number[][]) {
+        setFinalGrid([...finalGridRefState])
+        finalGridRef.current = [...finalGridRefState]
     }
 
     useEffect(() => {
@@ -147,8 +149,7 @@ const Grid = () => {
                         finalGridRef.current[i][j] = 0
                     break;
             }
-            setFinalGrid([...finalGridRef.current])
-            finalGridRef.current = [...finalGridRef.current]
+            saveGridState(finalGridRef.current);
         });
 
         return () => {
