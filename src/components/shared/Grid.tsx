@@ -129,7 +129,7 @@ const Grid = () => {
                     <DropdownMenuContent>
                         <DropdownMenuLabel>Quick Actions</DropdownMenuLabel>
                         <DropdownMenuSeparator/>
-                        <DropdownMenuItem>Clear Board</DropdownMenuItem>
+                        <DropdownMenuItem onClick={generateGrid}>Clear Board</DropdownMenuItem>
                         <DropdownMenuItem>Clear Walls & Weights</DropdownMenuItem>
                         <DropdownMenuItem>Clear Path</DropdownMenuItem>
                         <DropdownMenuSub>
