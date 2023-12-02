@@ -75,6 +75,19 @@ const Grid = () => {
         finalGridRef.current = [...finalGridRef.current];
     }
 
+    function clearPath() {
+        if (finalGridRef.current === undefined) return;
+        for (let i = 0; i < finalGridRef.current.length; i++) {
+            for (let j = 0; j < finalGridRef.current[i].length; j++) {
+                if (finalGridRef.current[i][j] === 6 || finalGridRef.current[i][j] === 7 || finalGridRef.current[i][j] === 8 || finalGridRef.current[i][j] === 9) {
+                    finalGridRef.current[i][j] = 0;
+                }
+            }
+        }
+        setFinalGrid([...finalGridRef.current]);
+        finalGridRef.current = [...finalGridRef.current];
+    }
+
     function moveStartAndEnd(i: number, j: number) {
         if (finalGridRef.current === undefined) return;
         if (finalGridRef.current[i][j] === 3 || finalGridRef.current[i][j] === 4) return;
@@ -178,7 +191,7 @@ const Grid = () => {
                         <DropdownMenuSeparator/>
                         <DropdownMenuItem onClick={generateGrid}>Clear Board</DropdownMenuItem>
                         <DropdownMenuItem onClick={clearWallsAndWeights}>Clear Walls & Weights</DropdownMenuItem>
-                        <DropdownMenuItem>Clear Path</DropdownMenuItem>
+                        <DropdownMenuItem onClick={clearPath}>Clear Path</DropdownMenuItem>
                         <DropdownMenuSub>
                             <DropdownMenuSubTrigger>Speed</DropdownMenuSubTrigger>
                             <DropdownMenuPortal>
