@@ -1,5 +1,5 @@
 import {useEffect, useRef, useState} from "react";
-import {CircleDot, Cuboid, Eraser, Play, Weight} from "lucide-react";
+import {CircleDot, Cuboid, Eraser, Move, Play, Weight} from "lucide-react";
 import {ToggleGroup, ToggleGroupItem} from "@/components/ui/toggle-group.tsx";
 import {
     DropdownMenu,
@@ -38,6 +38,10 @@ const Grid = () => {
 
     const isDown = useRef<boolean>(false);
 
+    const isStartOrEnd = useRef<number>();
+
+    const previousStartOrEnd = useRef<number[]>([]);
+
     function generateGrid() {
         const width = window.innerWidth * 0.9 / 25;
         const height = (window.innerHeight - 240) / 25;
@@ -71,26 +75,56 @@ const Grid = () => {
         finalGridRef.current = [...finalGridRef.current];
     }
 
+    function moveStartAndEnd(i: number, j: number) {
+        if (finalGridRef.current === undefined) return;
+        if (finalGridRef.current[i][j] === 3 || finalGridRef.current[i][j] === 4) return;
+        finalGridRef.current[previousStartOrEnd.current[0]][previousStartOrEnd.current[1]] = 0;
+        finalGridRef.current[i][j] = isStartOrEnd.current === 3 ? 3 : 4;
+        if (!(previousStartOrEnd.current[0] === i && previousStartOrEnd.current[1] === j))
+            previousStartOrEnd.current = [i, j];
+        setFinalGrid([...finalGridRef.current]);
+
+    }
+
+    function getIAndJ(event: PointerEvent) {
+        return (event.target as HTMLElement).id.split(',').map(function (item) {
+            return parseInt(item, 10);
+        });
+    }
+
     useEffect(() => {
         if (typeof window === "undefined") return;
         if (typeof document === "undefined") return;
         generateGrid();
 
-        window.addEventListener("pointerdown", () => {
+        window.addEventListener("pointerdown", (event) => {
+            event.preventDefault();
+            const [i, j] = getIAndJ(event);
+            if (isNaN(i) || isNaN(j)) return;
+            if (finalGridRef.current === undefined) return;
+            if ((finalGridRef.current[i][j] === 3 || finalGridRef.current[i][j] === 4) && command.current === "moveStartOrEnd") {
+                isStartOrEnd.current = finalGridRef.current[i][j];
+                previousStartOrEnd.current = [i, j];
+            }
             isDown.current = true;
         })
 
-        window.addEventListener("pointerup", () => {
+        window.addEventListener("pointerup", (event) => {
+            event.preventDefault();
             isDown.current = false;
+            isStartOrEnd.current = undefined;
         })
 
 
         window.addEventListener("pointerover", (event) => {
+            event.preventDefault();
             if (!isDown.current || finalGridRef.current === undefined) return;
-            const [i, j] = (event.target as HTMLElement).id.split(',').map(function (item) {
-                return parseInt(item, 10);
-            });
+            const [i, j] = getIAndJ(event);
             if (isNaN(i) || isNaN(j)) return;
+            if (isStartOrEnd.current) {
+                moveStartAndEnd(i, j)
+                return;
+            }
             switch (command.current) {
                 case "walls":
                     if (finalGridRef.current[i][j] === 0) finalGridRef.current[i][j] = 1;
@@ -134,6 +168,9 @@ const Grid = () => {
                     <ToggleGroupItem value="delete" aria-label="Delete Walls & Weights">
                         <Eraser strokeWidth={3} className="h-4 w-4"/>
                     </ToggleGroupItem>
+                    <ToggleGroupItem value="moveStartOrEnd" aria-label="Move Start or End">
+                        <Move strokeWidth={3} className="h-4 w-4"/>
+                    </ToggleGroupItem>
                 </ToggleGroup>
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -172,9 +209,11 @@ const Grid = () => {
                                                  className="w-[25px] h-[25px] border-[0.5px] border-gray-600 flex justify-center items-center">
                                                 {finalGrid[i][j] === 1 ? <div
                                                     className="w-full h-full bg-gray-700"/> : finalGrid[i][j] === 2 ?
-                                                    <Weight  strokeWidth={2} id={[i, j].toString()}/> : finalGrid[i][j] === 3 ?
-                                                        <Play strokeWidth={5}/> : finalGrid[i][j] === 4 ?
-                                                            <CircleDot strokeWidth={5}/> : null}
+                                                    <Weight strokeWidth={2}
+                                                            id={[i, j].toString()}/> : finalGrid[i][j] === 3 ?
+                                                        <Play strokeWidth={5}
+                                                              id={[i, j].toString()}/> : finalGrid[i][j] === 4 ?
+                                                            <CircleDot strokeWidth={5} id={[i, j].toString()}/> : null}
                                             </div>
                                         )
                                     })
